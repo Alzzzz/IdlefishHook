@@ -29,6 +29,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     CheckBox okHttpCb;
+    CheckBox logCb;
     IdlefishConfig idlefishConfig;
 
     String[] permissionList = {
@@ -42,7 +43,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         okHttpCb = findViewById(R.id.cb_okhttp_hook);
+        logCb = findViewById(R.id.cb_log_hook);
+
         okHttpCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        logCb.setOnCheckedChangeListener(new OnHookCheckListener());
+
         setupViews();
 
         PermissionUtil.initPermission(this, permissionList,
@@ -94,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             okHttpCb.setChecked(false);
         }
+
+        if (idlefishConfig.isLogHook()){
+            logCb.setChecked(true);
+        } else {
+            logCb.setChecked(false);
+        }
     }
 
     /**
@@ -136,11 +147,11 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(FileUtils.PATH_FILE_DIR);
         if (file.exists()) {
             LOGGER.d("文件已存在");
-            file.delete();
+        } else {
+            file.mkdirs();
+            FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_CONFIG);
+            FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_INTERCEPTOR,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_INTERCEPTOR);
         }
-        file.mkdirs();
-        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_CONFIG);
-        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_INTERCEPTOR,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_INTERCEPTOR);
         LOGGER.d("doCopyConfigFile finished");
     }
 
@@ -150,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (buttonView == okHttpCb){
                 idlefishConfig.setOkhttpHook(isChecked);
+            } else if (buttonView == logCb){
+                idlefishConfig.setLogHook(isChecked);
             }
         }
     }
