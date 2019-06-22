@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
         LOGGER.d("doCopyConfigFile starting");
         File file = new File(FileUtils.PATH_FILE_DIR);
         if (file.exists()) {
-            LOGGER.e("文件已存在");
+            LOGGER.d("文件已存在");
             file.delete();
         }
         file.mkdirs();
         FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_CONFIG);
-        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_INTERCEPTOR);
+        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_INTERCEPTOR,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_INTERCEPTOR);
         LOGGER.d("doCopyConfigFile finished");
     }
 

@@ -140,16 +140,16 @@ public class FileUtils {
         //测试把文件直接复制到sd卡中 fileSdPath完整路径
         File file = new File(fileSdPath);
         if (!file.exists()) {
-            LOGGER.d("************文件不存在,文件创建");
+            LOGGER.d("************文件不存在,文件创建************");
             try {
                 copyBigDataToSD(context, fileAssetPath, fileSdPath);
-                LOGGER.d("************拷贝成功");
+                LOGGER.d("************拷贝成功************");
             } catch (IOException e) {
-                LOGGER.d("************拷贝失败");
+                LOGGER.d("************拷贝失败************");
                 e.printStackTrace();
             }
         } else {
-            LOGGER.d("************文件夹存在,文件存在");
+            LOGGER.d("************文件夹存在,文件存在************");
         }
 
     }

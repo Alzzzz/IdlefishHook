@@ -12,6 +12,7 @@ import com.alzzz.idlefishhook.utils.LOGGER;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -97,7 +98,8 @@ public class Hook implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
-                List interceptors = (List) XposedHelpers.getObjectField(instanceClazz, "interceptors");
+                LOGGER.d("正在运行build方法，开始hook");
+                List interceptors = (List) XposedHelpers.getObjectField(param.thisObject, "interceptors");
 
                 if (interceptors != null){
                     //如果获取到了interceptors
@@ -108,6 +110,8 @@ public class Hook implements IXposedHookLoadPackage {
                         LOGGER.d("获取到Log的interceptor");
                         interceptors.add(logInterceptor);
                     }
+                    LOGGER.d("interceptors = "+interceptors.size());
+                    LOGGER.e("has been hooked succeed!");
                 }
             }
 
@@ -123,8 +127,13 @@ public class Hook implements IXposedHookLoadPackage {
      * @return
      */
     private Object getLoggingInterceptor() {
-        DexClassLoader dexClassLoader = new DexClassLoader(FileUtils.PATH_FILE_DIR, FileUtils.PATH_OUT_DIR,
-                null, mClassLoader);
+        String jarPath = FileUtils.PATH_FILE_DIR + File.separator + FileUtils.FILE_NAME_INTERCEPTOR;
+        LOGGER.d("当前jarPath="+jarPath);
+        File file = new File(jarPath);
+        if (file.exists()){
+            LOGGER.d("存在interceptor的jar文件");
+        }
+        DexClassLoader dexClassLoader = new DexClassLoader(jarPath, FileUtils.PATH_OUT_DIR, null, mClassLoader);
         try {
             mHttpLoggingInterceptor = dexClassLoader.loadClass("com.alzzz.interceptor.AlzInterceptor");
             mLoggerClass = dexClassLoader.loadClass("com.alzzz.interceptor.AlzInterceptor$Logger");
@@ -144,7 +153,7 @@ public class Hook implements IXposedHookLoadPackage {
      */
     private Object InitInterceptor() {
         //动态代理
-        Object logger = Proxy.newProxyInstance(mClassLoader, new Class[]{mLoggerClass}, new InvocationHandler() {
+        Object logger = Proxy.newProxyInstance(mLoggerClass.getClassLoader(), new Class[]{mLoggerClass}, new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 LOGGER.d((String) args[0]);
@@ -181,6 +190,7 @@ public class Hook implements IXposedHookLoadPackage {
             if (!TextUtils.isEmpty(content)){
                 JSONObject jsonObject = new JSONObject(content);
                 idlefishConfig.decode(jsonObject);
+                LOGGER.d(content);
             }
         } catch (IOException e) {
             e.printStackTrace();

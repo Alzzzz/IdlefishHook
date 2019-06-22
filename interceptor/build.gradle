@@ -5,6 +5,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
 }
 
-sourceCompatibility = "7"
-targetCompatibility = "7"
+sourceCompatibility = "8"
+targetCompatibility = "8"
 
