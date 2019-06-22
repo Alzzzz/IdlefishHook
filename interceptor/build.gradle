@@ -1,0 +1,10 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
+

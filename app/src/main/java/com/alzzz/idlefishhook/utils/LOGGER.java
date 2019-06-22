@@ -37,4 +37,13 @@ public class LOGGER {
     public static void e(String content){
         Log.e(TAG, content);
     }
+
+    /**
+     * log.d
+     *
+     * @param content
+     */
+    public static void e(String tag, String content){
+        Log.e(tag, content);
+    }
 }

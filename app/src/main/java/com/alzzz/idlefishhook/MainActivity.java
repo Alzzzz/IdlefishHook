@@ -7,7 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -17,7 +21,11 @@ import com.alzzz.idlefishhook.utils.FileUtils;
 import com.alzzz.idlefishhook.utils.LOGGER;
 import com.alzzz.idlefishhook.utils.PermissionUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     CheckBox okHttpCb;
@@ -34,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         okHttpCb = findViewById(R.id.cb_okhttp_hook);
+        okHttpCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        setupViews();
 
         PermissionUtil.initPermission(this, permissionList,
                 new PermissionUtil.PermissionCallback() {
@@ -42,6 +52,66 @@ public class MainActivity extends AppCompatActivity {
                 doCopyConfigFile();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.tv_save){
+            saveConfig();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 保存设置
+     */
+    private void saveConfig() {
+        String content = idlefishConfig.toJson();
+        try {
+            FileUtils.clearInfoForFile(FileUtils.PATH_FILE_DIR,
+                    FileUtils.FILE_NAME_CONFIG);
+            FileUtils.saveContentToFile(FileUtils.PATH_FILE_DIR,
+                    FileUtils.FILE_NAME_CONFIG, content);
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            LOGGER.d("保存成功");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setupViews() {
+        //初始化配置的设置
+        initConfig();
+        if (idlefishConfig.isOkhttpHook()){
+            okHttpCb.setChecked(true);
+        } else {
+            okHttpCb.setChecked(false);
+        }
+    }
+
+    /**
+     * 初始化设置，必须在最前
+     */
+    private void initConfig() {
+        idlefishConfig = new IdlefishConfig();
+        try {
+            String content = FileUtils.getFileContent(FileUtils.PATH_FILE_DIR, FileUtils.FILE_NAME_CONFIG);
+            if (!TextUtils.isEmpty(content)){
+                JSONObject jsonObject = new JSONObject(content);
+                idlefishConfig.decode(jsonObject);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -63,17 +133,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void doCopyConfigFile(){
         LOGGER.d("doCopyConfigFile starting");
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "IdlefishHook";
-        String Outpath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "IdlefishHook"+"/"+"Out";
-        File file = new File(path);
-        File file1 = new File(Outpath);
+        File file = new File(FileUtils.PATH_FILE_DIR);
         if (file.exists()) {
             LOGGER.e("文件已存在");
             file.delete();
         }
         file.mkdirs();
-        file1.mkdirs();
-        FileUtils.Assets2Sd(this,"idlefish_hook_config",path+"/"+"idlefish_hook_config");
+        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_CONFIG);
+        FileUtils.Assets2Sd(this,FileUtils.FILE_NAME_CONFIG,FileUtils.PATH_FILE_DIR+File.separator+FileUtils.FILE_NAME_INTERCEPTOR);
         LOGGER.d("doCopyConfigFile finished");
     }
 
@@ -82,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (buttonView == okHttpCb){
-
+                idlefishConfig.setOkhttpHook(isChecked);
             }
         }
     }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">闲鱼hook</string>
+
+    <string name="menu_save">保存</string>
 </resources>
