@@ -30,6 +30,9 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     CheckBox okHttpCb;
     CheckBox logCb;
+    CheckBox xModuleCb;
+    CheckBox taobaoNetCb;
+
     IdlefishConfig idlefishConfig;
 
     String[] permissionList = {
@@ -44,9 +47,13 @@ public class MainActivity extends AppCompatActivity {
 
         okHttpCb = findViewById(R.id.cb_okhttp_hook);
         logCb = findViewById(R.id.cb_log_hook);
+        xModuleCb = findViewById(R.id.cb_xmodule_hook);
+        taobaoNetCb = findViewById(R.id.cb_taobao_net_hook);
 
         okHttpCb.setOnCheckedChangeListener(new OnHookCheckListener());
         logCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        xModuleCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        taobaoNetCb.setOnCheckedChangeListener(new OnHookCheckListener());
 
         setupViews();
 
@@ -104,6 +111,18 @@ public class MainActivity extends AppCompatActivity {
             logCb.setChecked(true);
         } else {
             logCb.setChecked(false);
+        }
+
+        if (idlefishConfig.isXModuleCenterHook()){
+            xModuleCb.setChecked(true);
+        } else {
+            xModuleCb.setChecked(false);
+        }
+
+        if (idlefishConfig.isTaobaoNetHook()){
+            taobaoNetCb.setChecked(true);
+        } else {
+            taobaoNetCb.setChecked(false);
         }
     }
 
@@ -163,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 idlefishConfig.setOkhttpHook(isChecked);
             } else if (buttonView == logCb){
                 idlefishConfig.setLogHook(isChecked);
+            } else if (buttonView == xModuleCb){
+                idlefishConfig.setXModuleCenterHook(isChecked);
+            } else if (buttonView == taobaoNetCb){
+                idlefishConfig.setTaobaoNetHook(isChecked);
             }
         }
     }

@@ -69,10 +69,22 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         if (idlefishConfig.isLogHook()){
+            //开启了log hook开关
             LOGGER.d("starting log hook");
             IFishHook logHook = new FishLogHook(mApplicationContext, mClassLoader);
             logHook.startHook();
+        }
 
+        if (idlefishConfig.isXModuleCenterHook()){
+            LOGGER.d("starting XModuleCenter hook");
+            IFishHook xModuleHook = new XModuleCenterHook(mApplicationContext, mClassLoader);
+            xModuleHook.startHook();
+        }
+
+        if (idlefishConfig.isTaobaoNetHook()){
+            LOGGER.d("starting TaobaoNet hook");
+            IFishHook taobaoNetHook = new TaobaoNetHook(mApplicationContext, mClassLoader);
+            taobaoNetHook.startHook();
         }
     }
 

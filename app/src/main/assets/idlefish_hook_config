@@ -1,3 +1,5 @@
 {
-  "okhttpHook":true
+  "okhttpHook":false,
+  "logHook":false,
+  "XModuleCenterHook":false
 }
