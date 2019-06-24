@@ -3,7 +3,6 @@ package com.alzzz.idlefishhook.xposed;
 import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alzzz.idlefishhook.bean.IdlefishConfig;
 import com.alzzz.idlefishhook.utils.FileUtils;
@@ -12,15 +11,8 @@ import com.alzzz.idlefishhook.utils.LOGGER;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
 
-import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -72,12 +64,14 @@ public class Hook implements IXposedHookLoadPackage {
         if (idlefishConfig.isOkhttpHook()){
             //开启了okHttp hook开关
             LOGGER.d("starting okhttp hook");
-            OkHttpHook okHttpHook = new OkHttpHook(mApplicationContext, mClassLoader);
-            okHttpHook.hookOkHttp();
+            IFishHook okHttpHook = new OkHttpHook(mApplicationContext, mClassLoader);
+            okHttpHook.startHook();
         }
 
         if (idlefishConfig.isLogHook()){
             LOGGER.d("starting log hook");
+            IFishHook logHook = new FishLogHook(mApplicationContext, mClassLoader);
+            logHook.startHook();
 
         }
     }

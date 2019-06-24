@@ -1,18 +1,11 @@
 package com.alzzz.idlefishhook.xposed;
 
-import android.app.Application;
 import android.content.Context;
-import android.text.TextUtils;
 
-import com.alzzz.idlefishhook.bean.IdlefishConfig;
 import com.alzzz.idlefishhook.utils.FileUtils;
 import com.alzzz.idlefishhook.utils.LOGGER;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +21,7 @@ import de.robv.android.xposed.XposedHelpers;
  * @Date 2019-06-23
  * @Author sz
  */
-public class OkHttpHook {
+public class OkHttpHook implements IFishHook{
     private Context mApplicationContext;
     private ClassLoader mClassLoader;
 
@@ -43,10 +36,8 @@ public class OkHttpHook {
         this.mClassLoader = classLoader;
     }
 
-    /**
-     * OkHttp Hook方法
-     */
-    public void hookOkHttp() {
+    @Override
+    public void startHook() {
         //闲鱼没有LoggingInterceptor只能通过自己写的hook进行
         if (instanceClazz == null) {
             try {
