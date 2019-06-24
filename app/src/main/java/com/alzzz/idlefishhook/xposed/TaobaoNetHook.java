@@ -42,23 +42,19 @@ public class TaobaoNetHook implements IFishHook {
             return;
         }
         LOGGER.d("TaobaoNetHook ===> instanceClazz="+instanceClazz);
-        doTaobaoNetHook();
+        doMtopRequestHook();
+        doTopPropHook();
+
     }
 
     /**
      * 只hook MtopBuilder的asyncRequest方法
      */
-    private void doTaobaoNetHook() {
+    private void doMtopRequestHook() {
         try {
             Class<?> remoteContextClazz = Class.forName("com.taobao.android.remoteobject.core.RemoteContext", true, mClassLoader);
             LOGGER.d("TaobaoNetHook ===> remoteContextClazz="+remoteContextClazz);
 
-            try {
-                Method method = instanceClazz.getMethod("preProcess", remoteContextClazz);
-                LOGGER.d("TaobaoNetHook ===> method=["+method+"]");
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
             //找到对应方法
             XposedHelpers.findAndHookMethod(instanceClazz, "preProcess", remoteContextClazz, new XC_MethodHook() {
                 @Override
@@ -87,6 +83,43 @@ public class TaobaoNetHook implements IFishHook {
                     toStringMethod.setAccessible(true);
                     String content = (String)toStringMethod.invoke(internalRequest);
                     LOGGER.d("TaobaoNetHook ===> request = ["+content+"]");
+                }
+            });
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 进行TopProp的hook尝试
+     */
+    private void doTopPropHook() {
+        try {
+            Class<?> mtopBuilderClazz = Class.forName("mtopsdk.mtop.intf.MtopBuilder", true, mClassLoader);
+            LOGGER.d("TaobaoNetHook ===> mtopBuilderClazz="+mtopBuilderClazz);
+
+            //hook asyncRequest方法
+            Class<?> mtopListener = Class.forName("mtopsdk.mtop.common.MtopListener", true, mClassLoader);
+            LOGGER.d("TaobaoNetHook ===> mCallbakClazz="+mtopListener);
+
+            XposedHelpers.findAndHookMethod(mtopBuilderClazz, "asyncRequest", mtopListener, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                }
+
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Field mtopPropField = mtopBuilderClazz.getDeclaredField("mtopProp");
+                    mtopPropField.setAccessible(true);
+                    Object mtopProp = mtopPropField.get(param.thisObject);
+                    LOGGER.d("TaobaoNetHook ===> mtopProp="+mtopProp);
+                    Class<?> mtopNetworkPropClazz = Class.forName("mtopsdk.mtop.common.MtopNetworkProp", true, mClassLoader);
+                    Method toStringMethod = mtopNetworkPropClazz.getMethod("toString");
+                    LOGGER.d("TaobaoNetHook ===> toStringMethod="+toStringMethod);
+                    String content = (String) toStringMethod.invoke(mtopProp);
+                    LOGGER.e("TaobaoNetHook ===> mtopProp="+content);
                 }
             });
         } catch (ClassNotFoundException e) {
