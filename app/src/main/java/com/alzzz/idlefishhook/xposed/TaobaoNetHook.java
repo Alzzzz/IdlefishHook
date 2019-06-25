@@ -7,6 +7,7 @@ import com.alzzz.idlefishhook.utils.LOGGER;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -21,6 +22,8 @@ public class TaobaoNetHook implements IFishHook {
     private ClassLoader mClassLoader;
 
     private Class<?> instanceClazz;
+
+    private boolean outParams = false;
 
     public TaobaoNetHook(Context mApplicationContext, ClassLoader mClassLoader) {
         this.mApplicationContext = mApplicationContext;
@@ -42,8 +45,85 @@ public class TaobaoNetHook implements IFishHook {
             return;
         }
         LOGGER.d("TaobaoNetHook ===> instanceClazz="+instanceClazz);
-        doMtopRequestHook();
-        doTopPropHook();
+        if (outParams){
+            doMtopRequestHook();
+            doTopPropHook();
+        }
+        doTaobaoRequestHook();
+
+    }
+
+//    private void doHeaderHook() {
+//        try {
+//            Class<?> convertClazz = Class.forName("mtopsdk.mtop.protocol.converter.impl.AbstractNetworkConverter", true, mClassLoader);
+//
+//            XposedHelpers.findAndHookMethod(convertClazz, "a", Map.class, Map.class, boolean.class, new XC_MethodHook() {
+//                @Override
+//                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                    super.beforeHookedMethod(param);
+//                    if (param.args != null){
+//                        Map<String,String> param1 = (Map<String, String>) param.args[0];
+//                        Map<String,String> param2 = (Map<String, String>) param.args[1];
+//                        boolean param3 = (boolean) param.args[2];
+//
+//                        for (Map.Entry entry:param1.entrySet()){
+//                            LOGGER.d("TaobaoNetHook ===> param1:[key="+
+//                                    entry.getKey()+",value="+entry.getValue()+"]");
+//                        }
+//
+//                        for (Map.Entry entry:param2.entrySet()){
+//                            LOGGER.d("TaobaoNetHook ===> param1:[key="+
+//                                    entry.getKey()+",value="+entry.getValue()+"]");
+//                        }
+//
+//                        LOGGER.e("TaobaoNetHook ===> param3="+param3);
+//                    }
+//
+//                }
+//            });
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
+
+    private void doTaobaoRequestHook() {
+        try {
+            Class<?> convertFilterClazz = Class.forName("mtopsdk.framework.filter.before.NetworkConvertBeforeFilter", true, mClassLoader);
+//            LOGGER.d("TaobaoNetHook ===> convertFilterClazz="+convertFilterClazz);
+
+            Class<?> mtopContextClazz = Class.forName("mtopsdk.framework.domain.MtopContext", true, mClassLoader);
+//            LOGGER.d("TaobaoNetHook ===> mtopContextClazz="+mtopContextClazz);
+
+            XposedHelpers.findAndHookMethod(convertFilterClazz, "doBefore", mtopContextClazz, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    //打印出相关的内容
+                    if (param.args != null){
+                        Object mtopContext = param.args[0];
+                        Field requestField = null;
+
+                        Field[] fields = mtopContextClazz.getFields();
+                        for (Field field: fields){
+//                            LOGGER.d("TaobaoNetHook ===> 当前field的属性名为:"+field.getType().getName());
+                            if (field.getType().getName().equalsIgnoreCase("mtopsdk.network.domain.Request")){
+//                                LOGGER.d("TaobaoNetHook ===> 找到request属性");
+                                requestField = field;
+                                break;
+                            }
+                        }
+                        Object request = requestField.get(mtopContext);
+                        Method toStirngMethod = request.getClass().getMethod("toString");
+                        String content = (String) toStirngMethod.invoke(request);
+                        LOGGER.e("TaobaoNetHook ===> request Content = ["+content+"]");
+                    }
+
+                }
+            });
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 
