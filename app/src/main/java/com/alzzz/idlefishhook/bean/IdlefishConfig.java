@@ -13,6 +13,7 @@ public class IdlefishConfig {
     private boolean logHook;
     private boolean XModuleCenterHook;
     private boolean taobaoNetHook;
+    private boolean postServiceHook;
 
     public boolean isOkhttpHook() {
         return okhttpHook;
@@ -46,6 +47,14 @@ public class IdlefishConfig {
         this.taobaoNetHook = taobaoNetHook;
     }
 
+    public boolean isPostServiceHook() {
+        return postServiceHook;
+    }
+
+    public void setPostServiceHook(boolean postServiceHook) {
+        this.postServiceHook = postServiceHook;
+    }
+
     public String toJson(){
         JSONObject jsonObject = new JSONObject();
         try {
@@ -53,6 +62,7 @@ public class IdlefishConfig {
             jsonObject.put("logHook", logHook);
             jsonObject.put("XModuleCenterHook", XModuleCenterHook);
             jsonObject.put("taobaoNetHook", taobaoNetHook);
+            jsonObject.put("postServiceHook",postServiceHook);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -75,6 +85,10 @@ public class IdlefishConfig {
 
             if (jsonObject.has("taobaoNetHook")){
                 taobaoNetHook = jsonObject.optBoolean("taobaoNetHook");
+            }
+
+            if (jsonObject.has("postServiceHook")){
+                postServiceHook = jsonObject.optBoolean("postServiceHook");
             }
         }
     }

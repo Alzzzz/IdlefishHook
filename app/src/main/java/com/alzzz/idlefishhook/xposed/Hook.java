@@ -86,6 +86,12 @@ public class Hook implements IXposedHookLoadPackage {
             IFishHook taobaoNetHook = new TaobaoNetHook(mApplicationContext, mClassLoader);
             taobaoNetHook.startHook();
         }
+
+        if (idlefishConfig.isPostServiceHook()){
+            LOGGER.d("starting PostServiceHook");
+            IFishHook postServiceHook = new PostServiceHook(mApplicationContext, mClassLoader);
+            postServiceHook.startHook();
+        }
     }
 
     /**

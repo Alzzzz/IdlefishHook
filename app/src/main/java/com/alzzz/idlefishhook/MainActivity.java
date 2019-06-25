@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox logCb;
     CheckBox xModuleCb;
     CheckBox taobaoNetCb;
+    CheckBox pushPostCb;
 
     IdlefishConfig idlefishConfig;
 
@@ -49,21 +50,17 @@ public class MainActivity extends AppCompatActivity {
         logCb = findViewById(R.id.cb_log_hook);
         xModuleCb = findViewById(R.id.cb_xmodule_hook);
         taobaoNetCb = findViewById(R.id.cb_taobao_net_hook);
+        pushPostCb = findViewById(R.id.cb_push_post_hook);
 
         okHttpCb.setOnCheckedChangeListener(new OnHookCheckListener());
         logCb.setOnCheckedChangeListener(new OnHookCheckListener());
         xModuleCb.setOnCheckedChangeListener(new OnHookCheckListener());
         taobaoNetCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        pushPostCb.setOnCheckedChangeListener(new OnHookCheckListener());
 
         setupViews();
 
-        PermissionUtil.initPermission(this, permissionList,
-                new PermissionUtil.PermissionCallback() {
-            @Override
-            public void onPermissionSuccess() {
-                doCopyConfigFile();
-            }
-        });
+        PermissionUtil.initPermission(this, permissionList, this::doCopyConfigFile);
     }
 
     @Override
@@ -123,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
             taobaoNetCb.setChecked(true);
         } else {
             taobaoNetCb.setChecked(false);
+        }
+
+        if (idlefishConfig.isPostServiceHook()){
+            pushPostCb.setChecked(true);
+        } else {
+            pushPostCb.setChecked(false);
         }
     }
 
@@ -186,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
                 idlefishConfig.setXModuleCenterHook(isChecked);
             } else if (buttonView == taobaoNetCb){
                 idlefishConfig.setTaobaoNetHook(isChecked);
+            } else if (buttonView == pushPostCb){
+                idlefishConfig.setPostServiceHook(isChecked);
             }
         }
     }
