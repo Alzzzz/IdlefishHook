@@ -30,7 +30,8 @@ public class Hook implements IXposedHookLoadPackage {
     private ClassLoader mClassLoader;
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        if (IDLEFISH_NAME.equalsIgnoreCase(lpparam.packageName)){
+        if (IDLEFISH_NAME.equalsIgnoreCase(lpparam.packageName)
+                && "com.taobao.idlefish".equalsIgnoreCase(lpparam.processName)){
             //匹配到闲鱼
             //初始化配置
             initConfig();
