@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox xModuleCb;
     CheckBox taobaoNetCb;
     CheckBox pushPostCb;
+    CheckBox securityGuardCb;
 
     IdlefishConfig idlefishConfig;
 
@@ -51,12 +52,14 @@ public class MainActivity extends AppCompatActivity {
         xModuleCb = findViewById(R.id.cb_xmodule_hook);
         taobaoNetCb = findViewById(R.id.cb_taobao_net_hook);
         pushPostCb = findViewById(R.id.cb_push_post_hook);
+        securityGuardCb = findViewById(R.id.cb_security_guard_hook);
 
         okHttpCb.setOnCheckedChangeListener(new OnHookCheckListener());
         logCb.setOnCheckedChangeListener(new OnHookCheckListener());
         xModuleCb.setOnCheckedChangeListener(new OnHookCheckListener());
         taobaoNetCb.setOnCheckedChangeListener(new OnHookCheckListener());
         pushPostCb.setOnCheckedChangeListener(new OnHookCheckListener());
+        securityGuardCb.setOnCheckedChangeListener(new OnHookCheckListener());
 
         setupViews();
 
@@ -127,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             pushPostCb.setChecked(false);
         }
+
+        if (idlefishConfig.isSecurityGuardHook()){
+            securityGuardCb.setChecked(true);
+        } else {
+            securityGuardCb.setChecked(false);
+        }
     }
 
     /**
@@ -191,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
                 idlefishConfig.setTaobaoNetHook(isChecked);
             } else if (buttonView == pushPostCb){
                 idlefishConfig.setPostServiceHook(isChecked);
+            } else if (buttonView == securityGuardCb){
+                idlefishConfig.setSecurityGuardHook(isChecked);
             }
         }
     }

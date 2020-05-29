@@ -14,6 +14,15 @@ public class IdlefishConfig {
     private boolean XModuleCenterHook;
     private boolean taobaoNetHook;
     private boolean postServiceHook;
+    private boolean securityGuardHook;
+
+    public boolean isSecurityGuardHook() {
+        return securityGuardHook;
+    }
+
+    public void setSecurityGuardHook(boolean securityGuardHook) {
+        this.securityGuardHook = securityGuardHook;
+    }
 
     public boolean isOkhttpHook() {
         return okhttpHook;
@@ -63,6 +72,7 @@ public class IdlefishConfig {
             jsonObject.put("XModuleCenterHook", XModuleCenterHook);
             jsonObject.put("taobaoNetHook", taobaoNetHook);
             jsonObject.put("postServiceHook",postServiceHook);
+            jsonObject.put("securityGuardHook", securityGuardHook);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -89,6 +99,10 @@ public class IdlefishConfig {
 
             if (jsonObject.has("postServiceHook")){
                 postServiceHook = jsonObject.optBoolean("postServiceHook");
+            }
+
+            if (jsonObject.has("securityGuardHook")){
+                securityGuardHook = jsonObject.optBoolean("securityGuardHook");
             }
         }
     }

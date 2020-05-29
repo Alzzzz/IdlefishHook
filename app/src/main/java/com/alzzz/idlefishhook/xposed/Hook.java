@@ -93,6 +93,12 @@ public class Hook implements IXposedHookLoadPackage {
             IFishHook postServiceHook = new PostServiceHook(mApplicationContext, mClassLoader);
             postServiceHook.startHook();
         }
+
+        if (idlefishConfig.isSecurityGuardHook()){
+            LOGGER.d("starting SecurityGuardHook");
+            IFishHook securityGuardHook = new SecurityGuardHook(mApplicationContext, mClassLoader);
+            securityGuardHook.startHook();
+        }
     }
 
     /**
