@@ -84,8 +84,10 @@ public class Hook implements IXposedHookLoadPackage {
 
         if (idlefishConfig.isTaobaoNetHook()){
             LOGGER.d("starting TaobaoNet hook");
+            IFishHook disableSpdyHook = new DisableSpdyHook(mApplicationContext, mClassLoader);
             IFishHook taobaoNetHook = new TaobaoNetHook(mApplicationContext, mClassLoader);
             taobaoNetHook.startHook();
+            disableSpdyHook.startHook();
         }
 
         if (idlefishConfig.isPostServiceHook()){
